@@ -89,8 +89,6 @@
 	
 	isThroneButt = false;
 	
-	
-	
 	snd_hurt = sndSalamanderHurt;
 	snd_dead = sndSalamanderDead;
 	snd_lowh = sndSalamanderHurt;
@@ -122,20 +120,11 @@
 #define step
 	var mx = mouse_x[index], my = mouse_y[index];
 	
-	//disable all enemies ability to do contact damage
+	//reduce any enemy with a contact damage higher than 1 to 1
 	with(enemy){
-		self.canmelee = false;
-	}
-	
-	//Basic reimplimentation of contact damage
-	var hit_object = collision_circle(self.x, self.y, 3, enemy, false, true);
-	if(hit_object != -4 && nexthurt <= current_frame){
-		lasthit = [hit_object.spr_idle, ""];
-    	my_health--;	
-		nexthurt = current_frame + 10;
-		sprite_index = spr_hurt;
-		image_index = 0;
-		sound_play(snd_hurt);
+		if(self.meleedamage > 1){
+			self.meleedamage = 1;
+		}
 	}
 	
 	if (canspec){
@@ -212,8 +201,9 @@
 		grab_object_size = 0;
 	}
 	if grab_state != STATE_NEUTRAL{
+		//insuring the player cant shoot if they dont have thronebutt
 		if(!isThroneButt)
-			canfire = false;//insuring the player cant shoot if they dont have thronebutt
+			canfire = false;
 		if (grab_state != STATE_CARRY && grab_state != STATE_CARRY_HEAVY){
 			speed = median(-maxspeed * 0.5, speed, maxspeed * 0.5);
 		}else{
