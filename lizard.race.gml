@@ -87,9 +87,6 @@
 	
 	spr_hand_down = SPRITE.hand_up; // Temporary
 	
-	maxhealth = 200;
-	my_health = 200;
-	
 	isThroneButt = false;
 
 	snd_hurt = sndSalamanderHurt;
@@ -125,14 +122,9 @@
 	
 	//reduce any enemy with a contact damage higher than 1 to 1
 	with(enemy){
-		if(self.meleedamage <= 1)
-			break;
-		if(crystaltype == -4){
-				self.meleedamage = 1;
-		}else{ 
-			if(self.object_index != crystaltype.object_index){
-				self.meleedamage = 1;
-			}
+		//290 is crystaltype object_index we exclude them here to stop the player avoiding crystal contact damage
+		if(self.meleedamage > 1 && self.object_index != 290){
+			self.meleedamage = 1;
 		}
 	}
 
