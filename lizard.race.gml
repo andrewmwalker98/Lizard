@@ -89,6 +89,8 @@
 	
 	isThroneButt = false;
 	
+	
+	
 	snd_hurt = sndSalamanderHurt;
 	snd_dead = sndSalamanderDead;
 	snd_lowh = sndSalamanderHurt;
@@ -119,6 +121,23 @@
 	return argument0 >= min(argument1, argument2) && argument0 <= max(argument1, argument2);
 #define step
 	var mx = mouse_x[index], my = mouse_y[index];
+	
+	//disable all enemies ability to do contact damage
+	with(enemy){
+		self.canmelee = false;
+	}
+	
+	//Basic reimplimentation of contact damage
+	var hit_object = collision_circle(self.x, self.y, 3, enemy, false, true);
+	if(hit_object != -4 && nexthurt <= current_frame){
+		lasthit = [hit_object.spr_idle, ""];
+    	my_health--;	
+		nexthurt = current_frame + 10;
+		sprite_index = spr_hurt;
+		image_index = 0;
+		sound_play(snd_hurt);
+	}
+	
 	if (canspec){
 		if button_pressed(index,"spec"){
 			if grab_state = STATE_NEUTRAL{
