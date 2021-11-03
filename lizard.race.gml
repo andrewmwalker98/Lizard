@@ -21,8 +21,10 @@
 		race_text : "CAN GRAPPLE" + "#LESS @rCONTACT DAMAGE",
 		race_ttip : "",
 		race_tb_text : "",
-		race_ultra_name : ["Ultra 0 is not used","",""],
-		race_ultra_text : ["Ultra 0 is not used","",""]
+		race_ultra_name1 : ["Ultra 0 is not used","",""],
+		race_ultra_text1 : ["Ultra 0 is not used","",""],
+		race_ultra_name2 : ["Ultra 0 is not used","",""],
+		race_ultra_text2 : ["Ultra 0 is not used","",""],
 	}
 	with(instances_matching(Player,"race",mod_current)) create();
 
@@ -85,10 +87,11 @@
 	
 	spr_hand_down = SPRITE.hand_up; // Temporary
 	
-	maxhealth = 10;
+	maxhealth = 200;
+	my_health = 200;
 	
 	isThroneButt = false;
-	
+
 	snd_hurt = sndSalamanderHurt;
 	snd_dead = sndSalamanderDead;
 	snd_lowh = sndSalamanderHurt;
@@ -122,11 +125,17 @@
 	
 	//reduce any enemy with a contact damage higher than 1 to 1
 	with(enemy){
-		if(self.meleedamage > 1){
-			self.meleedamage = 1;
+		if(self.meleedamage <= 1)
+			break;
+		if(crystaltype == -4){
+				self.meleedamage = 1;
+		}else{ 
+			if(self.object_index != crystaltype.object_index){
+				self.meleedamage = 1;
+			}
 		}
 	}
-	
+
 	if (canspec){
 		if button_pressed(index,"spec"){
 			if grab_state = STATE_NEUTRAL{
