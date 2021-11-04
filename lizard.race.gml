@@ -19,9 +19,9 @@
 	global.info = {
 		race_name : "LIZARD",
 		race_text : "CAN GRAPPLE" + "#LESS @rCONTACT DAMAGE",
-		race_ttip : "",
+		race_ttip : "",//TODO: fill this out
 		race_tb_text : "Grapple with your jaws",
-		race_ultra_name1 : ["Ultra 0 is not used","",""],
+		race_ultra_name1 : ["Ultra 0 is not used","",""],//TODO: fill this out
 		race_ultra_text1 : ["Ultra 0 is not used","",""],
 		race_ultra_name2 : ["Ultra 1 is not used","",""],
 		race_ultra_text2 : ["Ultra 1 is not used","",""],
@@ -40,6 +40,20 @@
 #macro STATE_CARRY 6
 #macro STATE_CARRY_HEAVY 7
 
+//Character select sound
+var _race = [];
+for(var i = 0; i < maxp; i++) _race[i] = player_get_race(i);
+while(true){
+	for(var i = 0; i < maxp; i++){
+		var this_race = player_get_race(i);
+		if(_race[i] != this_race && this_race == "lizard"){
+			sound_play(sndHalloweenWolf);
+		}
+		_race[i] = this_race;
+	}
+	wait(1);
+}
+
 #define race_portrait
 	return SPRITE.portrait;
 #define race_name 
@@ -54,8 +68,8 @@
 	return INFO.race_tb_text;
 	
 #define game_start 
-	with(instances_matching(CustomDraw,"belongsTo",mod_current)) instance_destroy();
-	with(script_bind_draw(ultraicon,-10002)){
+	with(instances_matching(CustomDraw, "belongsTo", mod_current)) instance_destroy();
+	with(script_bind_draw(ultraicon, -10002)){
 		persistent = true;
 		belongsTo = mod_current;
 	}
@@ -68,7 +82,8 @@
 		}
 		trace(str);
 	}
-#define create 
+#define create
+	//local sprite declarations
 	spr_idle = SPRITE.idle;
 	spr_walk = SPRITE.walk;
 	spr_hurt = SPRITE.hurt;
@@ -84,6 +99,7 @@
 	
 	spr_hand_down = SPRITE.hand_up; // Temporary
 	
+	//default player sounds mostly temp TODO: change these to something better
 	snd_hurt = sndSalamanderHurt;
 	snd_dead = sndSalamanderDead;
 	snd_lowh = sndSalamanderHurt;
@@ -98,7 +114,8 @@
 	snd_spch = sndSalamanderHurt;
 	snd_idpd = sndSalamanderHurt;
 	
-	snd_throw = sndSnowBotThrow; // Temporary
+	//custom ability sounds mostly temp
+	snd_throw = sndSnowBotThrow;//TODO: change this to something better 
 	
 	grab_offset = [0, 0, 0, 16, 8, 4]; // Happens along the X axis only
 	grab_up_offset = [0, 0, 0, -12, -5, -2]; // Happens along the Y axis only
@@ -110,7 +127,7 @@
 	grab_index = 0;
 	lastGrab = current_frame;
 	
-#define range
+#define range //method for checking if a value is within the bounds of a range (inclusive)
 	return argument0 >= min(argument1, argument2) && argument0 <= max(argument1, argument2);
 #define step
 	var mx = mouse_x[index], my = mouse_y[index];
@@ -131,7 +148,7 @@
 
 	if (canspec){
 		if button_pressed(index,"spec"){
-			if grab_state = STATE_NEUTRAL{
+			if grab_state = STATE_NEUTRAL{//grab state change if we arent holding anything
 				grab_index = 0;
 				image_index = 0;
 				if range(gunangle, 90 + 30, 90 - 30){
@@ -146,13 +163,13 @@
 				lastGrab = current_frame;
 				canaim = false;
 			}else if grab_state = STATE_CARRY || grab_state = STATE_CARRY_HEAVY{
-				with(grab_object){
+				with(grab_object){//throw state change if we are holding something
 					x = other.x;
 					y = other.y;
 					sprite_index = other.grab_object_sprite;
 					image_index = 1;
 					image_speed = 0;
-					direction = point_direction(other.x,other.y,mx,my);
+					direction = point_direction(other.x, other.y, mx, my);
 					mask_index = mskWepPickup;
 					ind = other.grab_object_index;
 					if(fork()){
@@ -162,20 +179,20 @@
 							if spd < 10 spd -= 0.5;
 							speed = spd;
 							image_angle += speed * 15;
-							with(instances_matching_ne(hitme,"team",t)){
-								if place_meeting(x,y,other) && nexthurt < current_frame{
+							with(instances_matching_ne(hitme, "team", t)){
+								if place_meeting(x, y, other) && nexthurt < current_frame{
 									projectile_hit(self,5 + GameCont.level);
 									nexthurt = current_frame + 5;
 									spd --;
 								}
 							}
 							if place_meeting(x + lengthdir_x(speed, direction), y + lengthdir_y(speed,direction), Wall){
-								instance_change(ind,false);
+								instance_change(ind, false);
 								projectile_hit(self,8);
 								exit;
 							}
 							if spd < 5{
-								instance_change(ind,false);
+								instance_change(ind, false);
 								image_speed = 0.4;
 								image_angle = 0;
 								exit;
@@ -190,7 +207,7 @@
 				grab_object_sprite = mskNone;
 				grab_state = STATE_NEUTRAL;
 				image_alpha = 1;
-				motion_add(point_direction(other.x,other.y,mx,my), 4)
+				motion_add(point_direction(other.x, other.y, mx, my), 4)
 				sound_play(snd_throw);
 			}
 		}
@@ -214,33 +231,33 @@
 			}
 		}
 		grab_index = min(grab_index + (image_speed * current_time_scale), 6);
-		switch(grab_state){
+		switch(grab_state){//select the sprite to display based on the grab we are performing
 			case STATE_GRAB_SIDE: sprite_index = spr_grab; break;
 			case STATE_GRAB_UP: sprite_index = spr_grab_up; break;
 			case STATE_GRAB_DOWN: sprite_index = spr_grab_down; break;
 			case STATE_GRAB_UP_ANGLE: sprite_index = spr_grab_up_angle; break;
 			case STATE_GRAB_DOWN_ANGLE: sprite_index = spr_grab_down_angle; break;
 		}
-		if range(floor(grab_index),2,3) && grab_object = -4{
+		if range(floor(grab_index), 2, 3) && grab_object = -4{
 			if grab_state = STATE_GRAB_SIDE{
-				with(collision_circle(x + grab_offset[floor(grab_index)] * right, y, 8, enemy, 0, 1)){
+				with(collision_circle(x + grab_offset[floor(grab_index)] * right, y, 8, hitme, 0, 1)){//collision for side grab
 					other.grab_object = self;
 					other.grab_object_index = object_index;
 					other.grab_object_sprite = spr_hurt;
 					other.grab_object_size = size;
-					instance_change(GameObject,false);
+					instance_change(GameObject, false);
 				}
 			}else{
-				var ar = grab_up_offset;
+				var ar = grab_up_offset;//must be grabbing up or down
 				if grab_state = STATE_GRAB_DOWN{
-					ar = grab_down_offset;
+					ar = grab_down_offset;//set offset if we are grabbing down
 				}
-				with(collision_circle(x,y + ar[floor(grab_index)],8,enemy, 0, 1)){
+				with(collision_circle(x, y + ar[floor(grab_index)], 8, hitme, 0, 1)){//collision for downward/upward grab
 					other.grab_object = self;
 					other.grab_object_index = object_index;
 					other.grab_object_sprite = spr_hurt;
 					other.grab_object_size = size;
-					instance_change(GameObject,false);
+					instance_change(GameObject, false);
 				}
 			}
 		}
