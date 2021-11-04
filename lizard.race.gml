@@ -20,11 +20,11 @@
 		race_name : "LIZARD",
 		race_text : "CAN GRAPPLE" + "#LESS @rCONTACT DAMAGE",
 		race_ttip : "",
-		race_tb_text : "",
+		race_tb_text : "Grapple with your jaws",
 		race_ultra_name1 : ["Ultra 0 is not used","",""],
 		race_ultra_text1 : ["Ultra 0 is not used","",""],
-		race_ultra_name2 : ["Ultra 0 is not used","",""],
-		race_ultra_text2 : ["Ultra 0 is not used","",""],
+		race_ultra_name2 : ["Ultra 1 is not used","",""],
+		race_ultra_text2 : ["Ultra 1 is not used","",""],
 	}
 	with(instances_matching(Player,"race",mod_current)) create();
 
@@ -52,9 +52,6 @@
 	return INFO.race_ttip;
 #define race_tb_text 
 	return INFO.race_tb_text;
-
-#define race_tb_take
-	isThroneeButt = true;
 	
 #define game_start 
 	with(instances_matching(CustomDraw,"belongsTo",mod_current)) instance_destroy();
@@ -87,8 +84,6 @@
 	
 	spr_hand_down = SPRITE.hand_up; // Temporary
 	
-	isThroneButt = false;
-
 	snd_hurt = sndSalamanderHurt;
 	snd_dead = sndSalamanderDead;
 	snd_lowh = sndSalamanderHurt;
@@ -119,6 +114,12 @@
 	return argument0 >= min(argument1, argument2) && argument0 <= max(argument1, argument2);
 #define step
 	var mx = mouse_x[index], my = mouse_y[index];
+	
+	//how we might do smoke 
+	//repeat(15) with(instance_create(x+random_range(-10, 10), y+random_range(-10, 10), choose(SmokeOLD, DustOLD)))
+    //    depth -= 10;
+    
+    //trace();
 	
 	//reduce any enemy with a contact damage higher than 1 to 1
 	with(enemy){
@@ -203,7 +204,7 @@
 	}
 	if grab_state != STATE_NEUTRAL{
 		//insuring the player cant shoot if they dont have thronebutt
-		if(!isThroneButt)
+		if(!skill_get(5))
 			canfire = false;
 		if (grab_state != STATE_CARRY && grab_state != STATE_CARRY_HEAVY){
 			speed = median(-maxspeed * 0.5, speed, maxspeed * 0.5);
