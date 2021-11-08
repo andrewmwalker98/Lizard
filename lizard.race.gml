@@ -238,27 +238,53 @@ while(true){
 			case STATE_GRAB_UP_ANGLE: sprite_index = spr_grab_up_angle; break;
 			case STATE_GRAB_DOWN_ANGLE: sprite_index = spr_grab_down_angle; break;
 		}
-		if range(floor(grab_index), 2, 3) && grab_object = -4{
-			if grab_state = STATE_GRAB_SIDE{
-				with(collision_circle(x + grab_offset[floor(grab_index)] * right, y, 8, hitme, 0, 1)){//collision for side grab
-					other.grab_object = self;
-					other.grab_object_index = object_index;
-					other.grab_object_sprite = spr_hurt;
-					other.grab_object_size = size;
-					instance_change(GameObject, false);
-				}
-			}else{
-				var ar = grab_up_offset;//must be grabbing up or down
-				if grab_state = STATE_GRAB_DOWN{
-					ar = grab_down_offset;//set offset if we are grabbing down
-				}
-				with(collision_circle(x, y + ar[floor(grab_index)], 8, hitme, 0, 1)){//collision for downward/upward grab
-					other.grab_object = self;
-					other.grab_object_index = object_index;
-					other.grab_object_sprite = spr_hurt;
-					other.grab_object_size = size;
-					instance_change(GameObject, false);
-				}
+		if range(floor(grab_index), 2, 3) && grab_object = -4{//handling actual grab detection here
+			switch(grab_state){
+				case STATE_GRAB_SIDE:
+					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y, 8, hitme, 0, 1)){
+						other.grab_object = self;
+						other.grab_object_index = object_index;
+						other.grab_object_sprite = spr_hurt;
+						other.grab_object_size = size;
+						instance_change(GameObject, false);
+					}
+					break;
+				case STATE_GRAB_UP:
+					with(collision_circle(x, y + grab_up_offset[floor(grab_index)], 8, hitme, 0, 1)){
+						other.grab_object = self;
+						other.grab_object_index = object_index;
+				 		other.grab_object_sprite = spr_hurt;
+				 		other.grab_object_size = size;
+				 		instance_change(GameObject, false);
+				 	}
+				 	break;
+				case STATE_GRAB_DOWN:
+					with(collision_circle(x, y + grab_down_offset[floor(grab_index)], 8, hitme, 0, 1)){
+						other.grab_object = self;
+						other.grab_object_index = object_index;
+				 		other.grab_object_sprite = spr_hurt;
+				 		other.grab_object_size = size;
+				 		instance_change(GameObject, false);
+				 	}
+				 	break;
+				case STATE_GRAB_UP_ANGLE:
+					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y + grab_up_offset[floor(grab_index)], 8, hitme, 0, 1)){
+						other.grab_object = self;
+						other.grab_object_index = object_index;
+				 		other.grab_object_sprite = spr_hurt;
+				 		other.grab_object_size = size;
+				 		instance_change(GameObject, false);
+				 	}
+				 	break;
+				case STATE_GRAB_DOWN_ANGLE:
+					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y + grab_down_offset[floor(grab_index)], 8, hitme, 0, 1)){
+						other.grab_object = self;
+						other.grab_object_index = object_index;
+				 		other.grab_object_sprite = spr_hurt;
+				 		other.grab_object_size = size;
+				 		instance_change(GameObject, false);
+				 	}
+				 	break;
 			}
 		}
 		if grab_index >= 6 && (grab_state != STATE_CARRY && grab_state != STATE_CARRY_HEAVY){
