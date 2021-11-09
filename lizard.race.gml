@@ -268,8 +268,8 @@ while(true){
 			hori_offset = x_coeff * (grab_offset[floor(grab_index)] * right);
 			vert_offset = y_coeff * (vert_offset_temp[floor(grab_index)]);
 			with(collision_circle(x + hori_offset, y + vert_offset, 8, hitme, 0, 1)){
-				trace(self.object_index);//Current list of excluded objects: 56 gen, 52 throne,
-				if(self.object_index != 56 && self.object_index != 52){//excluding objects we want not to be grabbable here
+				trace(self.object_index);//Current list of excluded objects: 56 gen, 52 throne, 55  throne pillars
+				if(self.object_index != 56 && self.object_index != 52 && self.object_index != 55){//excluding objects we want not to be grabbable here
 				other.grab_object = self;
 				other.grab_object_index = object_index;
 				other.grab_object_sprite = spr_hurt;
