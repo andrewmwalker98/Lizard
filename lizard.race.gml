@@ -189,6 +189,8 @@ while(true){
 							if place_meeting(x + lengthdir_x(speed, direction), y + lengthdir_y(speed,direction), Wall){
 								instance_change(ind, false);
 								projectile_hit(self,8);
+								image_speed = 0.4;
+								image_angle = 0;
 								exit;
 							}
 							if spd < 5{
@@ -239,52 +241,41 @@ while(true){
 			case STATE_GRAB_DOWN_ANGLE: sprite_index = spr_grab_down_angle; break;
 		}
 		if range(floor(grab_index), 2, 3) && grab_object = -4{//handling actual grab detection here
+			x_coeff = 0;
+			y_coeff = 0;
+			vert_offset_temp = grab_up_offset;
 			switch(grab_state){
 				case STATE_GRAB_SIDE:
-					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y, 8, hitme, 0, 1)){
-						other.grab_object = self;
-						other.grab_object_index = object_index;
-						other.grab_object_sprite = spr_hurt;
-						other.grab_object_size = size;
-						instance_change(GameObject, false);
-					}
+					x_coeff = 1;
 					break;
-				case STATE_GRAB_UP:
-					with(collision_circle(x, y + grab_up_offset[floor(grab_index)], 8, hitme, 0, 1)){
-						other.grab_object = self;
-						other.grab_object_index = object_index;
-				 		other.grab_object_sprite = spr_hurt;
-				 		other.grab_object_size = size;
-				 		instance_change(GameObject, false);
-				 	}
+				case STATE_GRAB_UP://temp offset is already up
+					y_coeff = 1;
 				 	break;
 				case STATE_GRAB_DOWN:
-					with(collision_circle(x, y + grab_down_offset[floor(grab_index)], 8, hitme, 0, 1)){
-						other.grab_object = self;
-						other.grab_object_index = object_index;
-				 		other.grab_object_sprite = spr_hurt;
-				 		other.grab_object_size = size;
-				 		instance_change(GameObject, false);
-				 	}
+					y_coeff = 1;
+					vert_offset_temp = grab_down_offset;
 				 	break;
-				case STATE_GRAB_UP_ANGLE:
-					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y + grab_up_offset[floor(grab_index)], 8, hitme, 0, 1)){
-						other.grab_object = self;
-						other.grab_object_index = object_index;
-				 		other.grab_object_sprite = spr_hurt;
-				 		other.grab_object_size = size;
-				 		instance_change(GameObject, false);
-				 	}
+				case STATE_GRAB_UP_ANGLE://temp offset is already up
+					x_coeff = 1;
+					y_coeff = 1;
 				 	break;
 				case STATE_GRAB_DOWN_ANGLE:
-					with(collision_circle(x + grab_offset[floor(grab_index)] * right, y + grab_down_offset[floor(grab_index)], 8, hitme, 0, 1)){
-						other.grab_object = self;
-						other.grab_object_index = object_index;
-				 		other.grab_object_sprite = spr_hurt;
-				 		other.grab_object_size = size;
-				 		instance_change(GameObject, false);
-				 	}
+					x_coeff = 1;
+					y_coeff = 1;
+					vert_offset_temp = grab_down_offset;
 				 	break;
+			}
+			hori_offset = x_coeff * (grab_offset[floor(grab_index)] * right);
+			vert_offset = y_coeff * (vert_offset_temp[floor(grab_index)]);
+			with(collision_circle(x + hori_offset, y + vert_offset, 8, hitme, 0, 1)){
+				trace(self.object_index);//Current list of excluded objects: 56 gen, 52 throne,
+				if(self.object_index != 56 && self.object_index != 52){//excluding objects we want not to be grabbable here
+				other.grab_object = self;
+				other.grab_object_index = object_index;
+				other.grab_object_sprite = spr_hurt;
+		 		other.grab_object_size = size;
+		 		instance_change(GameObject, false);
+				}
 			}
 		}
 		if grab_index >= 6 && (grab_state != STATE_CARRY && grab_state != STATE_CARRY_HEAVY){
